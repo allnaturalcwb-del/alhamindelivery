@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 
@@ -79,7 +79,7 @@ export default function AutocompleteInput({ value, onChange, onBlur, placeholder
       />
       {loading && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
+          <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
         </div>
       )}
       {showList && suggestions.length > 0 && (
@@ -87,7 +87,7 @@ export default function AutocompleteInput({ value, onChange, onBlur, placeholder
           {suggestions.map((s, i) => (
             <li key={i}
               onMouseDown={() => handleSelect(s)}
-              className="px-4 py-3 text-sm text-gray-800 hover:bg-orange-50 hover:text-[#F7941D] cursor-pointer border-b border-gray-50 last:border-0 flex items-start gap-2">
+              className="px-4 py-3 text-sm text-gray-800 hover:bg-green-50 hover:text-[#2B6344] cursor-pointer border-b border-gray-50 last:border-0 flex items-start gap-2">
               <span className="mt-0.5 shrink-0">📍</span>
               <span>{s}</span>
             </li>

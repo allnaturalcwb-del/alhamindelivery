@@ -1,4 +1,4 @@
- export const ORIGEM = 'Av. Silva Jardim 2424, Batel, Curitiba, PR, Brazil'
+﻿ export const ORIGEM = 'process.env.TENANT_ORIGEM || 'Curitiba, PR, Brazil''
 
 export function calcularValorPorKm(km: number): number {
   if (km <= 3) return 6

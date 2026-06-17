@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -96,7 +96,7 @@ export default function QuiosqueSelecaoClient({ motoboysIniciais }: Props) {
                 type="checkbox"
                 checked={!!escalaTemp[m.id]}
                 onChange={e => setEscalaTemp(prev => ({ ...prev, [m.id]: e.target.checked }))}
-                className="w-7 h-7 accent-[#F7941D]"
+                className="w-7 h-7 accent-[#2B6344]"
               />
             </label>
           ))}

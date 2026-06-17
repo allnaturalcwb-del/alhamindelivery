@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { formatarValor } from '@/lib/km'
@@ -40,15 +40,15 @@ export default function DemoClient() {
   })
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0]">
+    <div className="min-h-screen bg-[#F5F0E6]">
 
       {/* Banner demo */}
-      <div className="bg-[#1C1C1C] border-b-2 border-[#F7941D] px-4 py-2 flex items-center justify-center gap-3">
-        <span className="text-[#F7941D] text-xs font-bold uppercase tracking-widest">🎯 Modo Demonstração</span>
+      <div className="bg-[#1C1C1C] border-b-2 border-[#2B6344] px-4 py-2 flex items-center justify-center gap-3">
+        <span className="text-[#2B6344] text-xs font-bold uppercase tracking-widest">🎯 Modo Demonstração</span>
         <span className="text-gray-400 text-xs">— dados fictícios para apresentação —</span>
         <a href="https://wa.me/5541996412444?text=Quero%20conhecer%20o%20RotaF%C3%A1cil!"
           target="_blank" rel="noopener noreferrer"
-          className="ml-4 bg-[#F7941D] text-white text-xs font-bold px-3 py-1 rounded-full hover:bg-[#e07a0a] transition-colors">
+          className="ml-4 bg-[#2B6344] text-white text-xs font-bold px-3 py-1 rounded-full hover:bg-[#1e4d31] transition-colors">
           Quero contratar →
         </a>
       </div>
@@ -56,13 +56,13 @@ export default function DemoClient() {
       {/* Header */}
       <header className="bg-[#1C1C1C] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#F7941D] rounded-lg flex items-center justify-center text-lg">🍔</div>
+          <div className="w-8 h-8 bg-[#2B6344] rounded-lg flex items-center justify-center text-lg">🍔</div>
           <div>
             <div className="font-bold text-sm leading-tight">SABOR & CIA</div>
             <div className="text-gray-400 text-xs">Admin · Demo</div>
           </div>
         </div>
-        <div className="text-xs text-[#F7941D] font-semibold border border-[#F7941D] px-2 py-1 rounded-full">DEMO</div>
+        <div className="text-xs text-[#2B6344] font-semibold border border-[#2B6344] px-2 py-1 rounded-full">DEMO</div>
       </header>
 
       {/* Stats */}
@@ -75,7 +75,7 @@ export default function DemoClient() {
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-white">
             <p className="text-xs text-gray-400">Custo do dia</p>
-            <p className="text-2xl font-bold text-[#F7941D]">{formatarValor(totalCorridas + 110)}</p>
+            <p className="text-2xl font-bold text-[#2B6344]">{formatarValor(totalCorridas + 110)}</p>
             <p className="text-xs text-gray-500">corridas + diárias</p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function DemoClient() {
           { key: 'enderecos', icon: <MapPin size={13} />, label: 'Endereços' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setAba(tab.key as typeof aba)}
-            className={`flex-shrink-0 px-3 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === tab.key ? 'border-[#F7941D] text-[#F7941D]' : 'border-transparent text-gray-400'}`}>
+            className={`flex-shrink-0 px-3 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === tab.key ? 'border-[#2B6344] text-[#2B6344]' : 'border-transparent text-gray-400'}`}>
             {tab.icon} {tab.label}
           </button>
         ))}
@@ -113,7 +113,7 @@ export default function DemoClient() {
                     <p className="text-xs text-gray-400">{m.tipo} · {m.entregas.length} entregas · {m.totalKm} km</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-[#F7941D]">{formatarValor(m.totalValor + m.valor_diaria)}</p>
+                    <p className="font-bold text-[#2B6344]">{formatarValor(m.totalValor + m.valor_diaria)}</p>
                     <p className="text-xs text-gray-400">diária + corridas</p>
                   </div>
                 </div>
@@ -145,17 +145,17 @@ export default function DemoClient() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="bg-orange-50 rounded-xl p-2">
+                <div className="bg-green-50 rounded-xl p-2">
                   <p className="text-gray-500">Entregas</p>
-                  <p className="font-bold text-lg text-[#F7941D]">38</p>
+                  <p className="font-bold text-lg text-[#2B6344]">38</p>
                 </div>
-                <div className="bg-orange-50 rounded-xl p-2">
+                <div className="bg-green-50 rounded-xl p-2">
                   <p className="text-gray-500">Dias</p>
-                  <p className="font-bold text-lg text-[#F7941D]">5</p>
+                  <p className="font-bold text-lg text-[#2B6344]">5</p>
                 </div>
-                <div className="bg-orange-50 rounded-xl p-2">
+                <div className="bg-green-50 rounded-xl p-2">
                   <p className="text-gray-500">Total</p>
-                  <p className="font-bold text-lg text-[#F7941D]">R$842</p>
+                  <p className="font-bold text-lg text-[#2B6344]">R$842</p>
                 </div>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function DemoClient() {
                     <p className="text-xs text-gray-400">14 entregas · 5 dias · {m.tipo}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black text-[#F7941D]">{formatarValor(m.valor_diaria * 5 + 112)}</p>
+                    <p className="text-xl font-black text-[#2B6344]">{formatarValor(m.valor_diaria * 5 + 112)}</p>
                     <p className="text-xs text-gray-400">a pagar</p>
                   </div>
                 </div>
@@ -226,7 +226,7 @@ export default function DemoClient() {
           <p className="text-gray-400 text-xs mb-4">Planos a partir de R$ 149/mês · Implantação inclusa</p>
           <a href="https://wa.me/5541996412444?text=Quero%20conhecer%20o%20RotaF%C3%A1cil!"
             target="_blank" rel="noopener noreferrer"
-            className="block bg-[#F7941D] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#e07a0a] transition-colors">
+            className="block bg-[#2B6344] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#1e4d31] transition-colors">
             Falar com o Kaue no WhatsApp →
           </a>
         </div>

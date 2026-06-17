@@ -371,7 +371,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             </div>
             {calculandoKm && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
+                <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
                 Calculando km...
               </div>
             )}
@@ -418,7 +418,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             )}
             {calculandoKm && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
+                <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
                 Calculando km...
               </div>
             )}

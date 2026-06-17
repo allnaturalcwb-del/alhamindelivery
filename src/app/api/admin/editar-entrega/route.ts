@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 
-const ORIGEM = 'Av. Silva Jardim 2424, Batel, Curitiba, PR, Brazil'
+const ORIGEM = 'process.env.TENANT_ORIGEM || 'Curitiba, PR, Brazil''
 
 function calcularValorPorKm(km: number): number {
   if (km <= 3) return 6

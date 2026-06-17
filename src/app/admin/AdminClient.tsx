@@ -617,7 +617,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
                 <CheckCircle2 size={24} className="text-green-600 mx-auto mb-2" />
                 <p className="font-bold text-green-700">Relatórios enviados!</p>
-                <p className="text-xs text-gray-500 mt-1">Dois emails enviados para allnatural.cwb@gmail.com</p>
+                <p className="text-xs text-gray-500 mt-1">Dois emails enviados para PREENCHER_EMAIL</p>
                 <button onClick={() => setQuinzenaEnviado(false)} className="mt-3 text-xs text-gray-400 underline">Enviar novamente</button>
               </div>
             ) : (
