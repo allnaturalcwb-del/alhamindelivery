@@ -5,7 +5,7 @@ export async function POST() {
   try {
     await enviarEmail(
       process.env.GMAIL_USER!,
-      '✅ Teste de email — Al'hamin Delivery Control',
+      "✅ Teste de email — Al'hamin Delivery Control",
       `
         <!DOCTYPE html>
         <html>
