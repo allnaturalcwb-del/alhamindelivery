@@ -9,6 +9,25 @@ import AutocompleteInput from '@/components/AutocompleteInput'
 import { getQuinzenaComOffset, formatarPeriodo, type Quinzena } from '@/lib/quinzena'
 import { gerarRelatorio } from '@/lib/relatorio'
 import { contarDiasAtivosPorTurno, getTurno, getTurnoInfo } from '@/lib/turno'
+import tenant from '@/lib/tenant'
+
+function getProximoPagamento() {
+  const agora = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+  const ano = agora.getFullYear()
+  const mes = agora.getMonth()
+  const candidatos = [
+    new Date(ano, mes, 5), new Date(ano, mes, 20),
+    new Date(ano, mes + 1, 5), new Date(ano, mes + 1, 20),
+  ].filter(d => d > agora)
+  const proximo = new Date(candidatos[0])
+  const dow = proximo.getDay()
+  if (dow === 6) proximo.setDate(proximo.getDate() + 2)
+  if (dow === 0) proximo.setDate(proximo.getDate() + 1)
+  const dias = Math.ceil((proximo.getTime() - agora.getTime()) / 86400000)
+  const dataFmt = proximo.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })
+  const semanaFmt = proximo.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
+  return { dataFmt, semanaFmt, dias }
+}
 
 // Tarifas admin (versão interna — usadas no painel e no relatório quinzenal modo admin)
 const DIARIA_MANHA_FIXO = 45
@@ -291,9 +310,9 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
       {/* Header */}
       <header className="bg-[#1C1C1C] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#2B6344] rounded-lg flex items-center justify-center text-lg">🌿</div>
+          <img src="/logo-alhamin.svg" alt={tenant.nome} className="w-8 h-8 rounded-lg" />
           <div>
-            <div className="font-bold text-sm leading-tight">ALL NATURAL</div>
+            <div className="font-bold text-sm leading-tight">AL&apos;HAMIN</div>
             <div className="text-gray-400 text-xs">Admin · {profile.nome.split(' ')[0]}</div>
           </div>
         </div>
@@ -302,16 +321,21 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
 
       {/* Stats */}
       <div className="bg-[#1C1C1C] px-4 pb-4">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <div className="bg-white/10 rounded-xl p-3 text-white">
-            <p className="text-xs text-gray-400">Entregas hoje</p>
+            <p className="text-xs text-gray-400">Entregas</p>
             <p className="text-2xl font-bold">{entregas.length}</p>
-            <p className="text-xs text-gray-500">{totalKm.toFixed(1)} km total</p>
+            <p className="text-xs text-gray-500">{totalKm.toFixed(1)} km</p>
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-white">
-            <p className="text-xs text-gray-400">Custo do dia</p>
-            <p className="text-2xl font-bold text-[#2B6344]">{formatarValor(totalValorCorridas + totalDiarias)}</p>
-            <p className="text-xs text-gray-500">corridas + diárias</p>
+            <p className="text-xs text-gray-400">Motoboys</p>
+            <p className="text-2xl font-bold">{motoboys.filter(m => m.ativo !== false).length}</p>
+            <p className="text-xs text-gray-500">ativos agora</p>
+          </div>
+          <div className="bg-white/10 rounded-xl p-3 text-white">
+            <p className="text-xs text-gray-400">Custo</p>
+            <p className="text-xl font-bold text-[#EDD9A3]">{formatarValor(totalValorCorridas + totalDiarias)}</p>
+            <p className="text-xs text-gray-500">corridas+diárias</p>
           </div>
         </div>
       </div>
@@ -337,6 +361,18 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
         {/* ABA HOJE */}
         {aba === 'entregas' && (
           <div className="space-y-3">
+            {/* Banner próximo pagamento */}
+            {(() => { const p = getProximoPagamento(); return (
+              <div className="bg-white rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Próximo pagamento</p>
+                  <p className="text-sm font-bold text-gray-800">{p.dataFmt} <span className="font-normal text-gray-400">({p.semanaFmt})</span></p>
+                </div>
+                <div className={`text-xs font-bold px-3 py-1.5 rounded-full ${p.dias <= 3 ? 'bg-[#EDD9A3] text-[#2B6344]' : 'bg-gray-100 text-gray-500'}`}>
+                  {p.dias === 0 ? 'hoje' : p.dias === 1 ? 'amanhã' : `em ${p.dias} dias`}
+                </div>
+              </div>
+            )})()}
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-800">Entregas de hoje</h2>
               <button onClick={recarregar} disabled={carregando} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
