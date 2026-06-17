@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -30,7 +30,7 @@ export default function LoginPage() {
           <div className="inline-flex flex-col items-center">
             <div className="w-28 h-28 bg-[#2B6344] border-4 border-[#EDD9A3]/40 rounded-2xl shadow-lg flex items-center justify-center mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-alhamin.png" alt="Al'hamin" className="w-24 h-24 object-contain rounded-xl" />
+              <img src="/logo-alhamin.svg" alt="Al'hamin" className="w-24 h-24 object-contain rounded-xl" />
             </div>
             <p className="text-[#EDD9A3]/80 text-sm mt-1">Culinária árabe autêntica</p>
             <p className="text-[#EDD9A3]/60 text-xs mt-3">Controle de Entregas</p>

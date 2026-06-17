@@ -132,7 +132,7 @@ export default function QuiosqueSelecaoClient({ motoboysIniciais }: Props) {
         <div className="flex justify-center mb-3">
           <div className="w-20 h-20 bg-[#2B6344] border-2 border-[#EDD9A3]/30 rounded-2xl flex items-center justify-center shadow-lg">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-alhamin.png" alt="Al'hamin" className="w-18 h-18 object-contain" />
+            <img src="/logo-alhamin.svg" alt="Al'hamin" className="w-18 h-18 object-contain" />
           </div>
         </div>
         <p className="text-[#EDD9A3]/70 mt-1 text-base">Culinária árabe autêntica</p>
