@@ -56,9 +56,9 @@ export default function DemoClient() {
       {/* Header */}
       <header className="bg-[#1C1C1C] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#2B6344] rounded-lg flex items-center justify-center text-lg">🍔</div>
+          <img src="/logo-alhamin.svg" alt="Al'hamin" className="w-8 h-8 rounded-lg" />
           <div>
-            <div className="font-bold text-sm leading-tight">SABOR & CIA</div>
+            <div className="font-bold text-sm leading-tight">AL'HAMIN</div>
             <div className="text-gray-400 text-xs">Admin · Demo</div>
           </div>
         </div>
