@@ -191,6 +191,8 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
   async function toggleMotoboy(id: string, ativo: boolean) {
     await supabase.from('profiles').update({ ativo }).eq('id', id)
     setMotoboys(prev => prev.map(m => m.id === id ? { ...m, ativo } : m))
+    // Ao reativar, recarrega entregas para garantir que só apareçam as de hoje
+    if (ativo) await recarregar()
   }
 
   async function criarMotoboy() {
