@@ -108,9 +108,8 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
 
   async function recarregar() {
     setCarregando(true)
-    const agora = new Date()
-    const hoje = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
-    hoje.setHours(0, 0, 0, 0)
+    const diaStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+    const hoje = new Date(diaStr + 'T03:00:00.000Z')
     const { data } = await supabase.from('entregas_completas').select('*').gte('created_at', hoje.toISOString()).order('created_at', { ascending: false })
     setEntregas(data || [])
     setCarregando(false)

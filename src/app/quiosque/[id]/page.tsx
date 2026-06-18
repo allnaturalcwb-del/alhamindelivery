@@ -20,9 +20,9 @@ export default async function QuiosqueMotoboy({ params }: Props) {
 
   if (!profile) notFound()
 
-  const agora = new Date()
-  const hoje = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
-  hoje.setHours(0, 0, 0, 0)
+  // Meia-noite BRT = 03:00 UTC (Brasil não tem horário de verão)
+  const diaStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+  const hoje = new Date(diaStr + 'T03:00:00.000Z')
 
   const { data: entregasHoje } = await supabase
     .from('entregas')
