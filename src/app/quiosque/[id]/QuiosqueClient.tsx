@@ -5,7 +5,11 @@ import { calcularValorPorKm, formatarValor } from '@/lib/km'
 import AutocompleteInput from '@/components/AutocompleteInput'
 import { useRouter } from 'next/navigation'
 import { Send, ArrowLeft, Package, TrendingUp, Plus } from 'lucide-react'
-import { getTurnoInfo } from '@/lib/turno'
+import { getTurnoInfo, getTurno } from '@/lib/turno'
+
+const DIARIA_MANHA_FIXO = 45
+const DIARIA_MANHA_AVULSO = 35
+const DIARIA_NOITE = 45
 
 type Profile = { id: string; nome: string; tipo: string; role: string; valor_diaria: number }
 type Entrega = { id: string; tipo: string; codigo_ifood: string | null; endereco_destino: string; km_calculado: number | null; valor_km: number; created_at: string; enviado_go?: boolean }
@@ -121,9 +125,13 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
 
   const kmNum = parseFloat(km.replace(',', '.'))
   const valorCalculado = !isNaN(kmNum) && kmNum > 0 ? calcularValorPorKm(kmNum) : 0
-  const valorDiaria = profile.valor_diaria || 30
   const totalValor = entregas.reduce((s, e) => s + e.valor_km, 0)
   const totalKm = entregas.reduce((s, e) => s + (e.km_calculado || 0), 0)
+  // Diária por turno: soma manhã e/ou noite conforme entregas registradas
+  const temManha = entregas.some(e => getTurno(new Date(e.created_at)) === 'manha')
+  const temNoite = entregas.some(e => getTurno(new Date(e.created_at)) === 'noite')
+  const diariaManha = profile.tipo === 'fixo' ? DIARIA_MANHA_FIXO : DIARIA_MANHA_AVULSO
+  const valorDiaria = (temManha ? diariaManha : 0) + (temNoite ? DIARIA_NOITE : 0)
   const podeConfirmar = tipo === 'ifood' ? codigoIfood && enderecoIfood && kmNum > 0 : enderecoAtual && kmNum > 0
 
   const calcularKmAuto = useCallback(async (endereco: string) => {
