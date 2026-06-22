@@ -39,6 +39,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // All Natural é o tenant principal — sem cobrança SaaS, acesso sempre livre
+  // Verificação de status de tenant só ativa quando NEXT_PUBLIC_TENANT_SLUG está definido
+  const tenantSlug = process.env.NEXT_PUBLIC_TENANT_SLUG
+  if (!tenantSlug) return supabaseResponse
+
   // Admin nunca é bloqueado por status de tenant
   const { data: profile } = await supabase
     .from('profiles')

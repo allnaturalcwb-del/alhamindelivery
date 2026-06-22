@@ -66,6 +66,12 @@ export default function LoginPage() {
               {carregando ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
+
+          <div className="mt-4 text-center">
+            <a href="/recuperar-senha" className="text-sm text-gray-400 hover:text-[#F7941D] transition">
+              Esqueceu a senha?
+            </a>
+          </div>
         </div>
 
         <p className="text-center text-white/70 text-sm mt-5">

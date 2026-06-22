@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { formatarValor } from '@/lib/km'
 import { useRouter } from 'next/navigation'
-import { LogOut, Users, MapPin, BarChart3, RefreshCw, Plus, Trash2, Calendar, FileText, Pencil, Check, X, Upload, AlertTriangle, CheckCircle2, CreditCard, ExternalLink } from 'lucide-react'
+import { LogOut, Users, MapPin, BarChart3, RefreshCw, Plus, Trash2, Calendar, FileText, Pencil, Check, X, Upload, AlertTriangle, CheckCircle2, CreditCard, ExternalLink, KeyRound } from 'lucide-react'
 import AutocompleteInput from '@/components/AutocompleteInput'
 import { getQuinzenaComOffset, formatarPeriodo, type Quinzena } from '@/lib/quinzena'
 import { gerarRelatorio } from '@/lib/relatorio'
@@ -352,7 +352,10 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
             <div className="text-gray-400 text-xs">Admin · {profile.nome.split(' ')[0]}</div>
           </div>
         </div>
-        <button onClick={sair} className="p-2 rounded-full hover:bg-gray-700"><LogOut size={18} /></button>
+        <div className="flex items-center gap-1">
+          <a href="/perfil" title="Trocar senha" className="p-2 rounded-full hover:bg-gray-700 text-gray-300 hover:text-white"><KeyRound size={18} /></a>
+          <button onClick={sair} className="p-2 rounded-full hover:bg-gray-700"><LogOut size={18} /></button>
+        </div>
       </header>
 
       {/* Stats */}
