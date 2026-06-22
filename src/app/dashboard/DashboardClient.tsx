@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -131,9 +131,9 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
   const msgWhatsApp = gerarMensagemWhatsApp(profile.nome, entregas)
 
   return (
-    <div className="min-h-screen bg-[#F5F0E6]">
+    <div className="min-h-screen bg-[#FFF8F0]">
       {/* Header */}
-      <header className="bg-[#2B6344] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-md">
+      <header className="bg-[#F7941D] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-md">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">🛵</span>
@@ -142,12 +142,12 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
               {turno.emoji} {turno.label}
             </span>
           </div>
-          <p className="text-[#EDD9A3]/70 text-xs mt-0.5">Al'hamin · Curitiba</p>
+          <p className="text-orange-100 text-xs mt-0.5">All Natural · Batel</p>
         </div>
         <div className="flex items-center gap-2">
           {entregas.length > 0 && (
             <button onClick={() => setShowGoModal(true)}
-              className="flex items-center gap-1 bg-white text-[#2B6344] font-bold px-3 py-2 rounded-xl text-sm shadow-sm active:scale-95 transition-transform">
+              className="flex items-center gap-1 bg-white text-[#F7941D] font-bold px-3 py-2 rounded-xl text-sm shadow-sm active:scale-95 transition-transform">
               <Send size={14} /> GO
             </button>
           )}
@@ -156,35 +156,35 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
       </header>
 
       {/* Stats */}
-      <div className="bg-[#2B6344] px-4 pb-4">
+      <div className="bg-[#F7941D] px-4 pb-4">
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-white/20 rounded-xl p-3 text-white text-center">
             <Package size={16} className="mx-auto mb-1 opacity-80" />
             <div className="text-xl font-bold">{entregas.length}</div>
-            <div className="text-xs text-[#EDD9A3]/70">entregas</div>
+            <div className="text-xs text-orange-100">entregas</div>
           </div>
           <div className="bg-white/20 rounded-xl p-3 text-white text-center">
             <TrendingUp size={16} className="mx-auto mb-1 opacity-80" />
             <div className="text-xl font-bold">{totalKm.toFixed(1)}</div>
-            <div className="text-xs text-[#EDD9A3]/70">km hoje</div>
+            <div className="text-xs text-orange-100">km hoje</div>
           </div>
           <div className="bg-white/20 rounded-xl p-3 text-white text-center">
             <span className="text-base block mb-1">💰</span>
             <div className="text-xl font-bold">{formatarValor(totalDia).replace('R$ ', '')}</div>
-            <div className="text-xs text-[#EDD9A3]/70">total hoje</div>
+            <div className="text-xs text-orange-100">total hoje</div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex bg-white border-b border-gray-100 sticky top-[72px] z-10 shadow-sm">
-        <button onClick={() => setAba('nova')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'nova' ? 'border-[#2B6344] text-[#2B6344]' : 'border-transparent text-gray-400'}`}>
+        <button onClick={() => setAba('nova')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'nova' ? 'border-[#F7941D] text-[#F7941D]' : 'border-transparent text-gray-400'}`}>
           <Plus size={14} /> Nova
         </button>
-        <button onClick={() => setAba('historico')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'historico' ? 'border-[#2B6344] text-[#2B6344]' : 'border-transparent text-gray-400'}`}>
+        <button onClick={() => setAba('historico')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'historico' ? 'border-[#F7941D] text-[#F7941D]' : 'border-transparent text-gray-400'}`}>
           <Clock size={14} /> Hoje ({entregas.length})
         </button>
-        <button onClick={() => setAba('tudo')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'tudo' ? 'border-[#2B6344] text-[#2B6344]' : 'border-transparent text-gray-400'}`}>
+        <button onClick={() => setAba('tudo')} className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === 'tudo' ? 'border-[#F7941D] text-[#F7941D]' : 'border-transparent text-gray-400'}`}>
           <Calendar size={14} /> Histórico
         </button>
       </div>
@@ -199,7 +199,7 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                 <button onClick={() => { setTipo('ifood'); setKm(''); setKmManual(false) }}
                   className={`py-3 rounded-xl font-semibold text-sm transition-all ${tipo === 'ifood' ? 'bg-red-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600'}`}>🛍️ iFood</button>
                 <button onClick={() => { setTipo('por_fora'); setKm(''); setKmManual(false) }}
-                  className={`py-3 rounded-xl font-semibold text-sm transition-all ${tipo === 'por_fora' ? 'bg-[#2B6344] text-white shadow-sm' : 'bg-gray-100 text-gray-600'}`}>📦 Por Fora</button>
+                  className={`py-3 rounded-xl font-semibold text-sm transition-all ${tipo === 'por_fora' ? 'bg-[#F7941D] text-white shadow-sm' : 'bg-gray-100 text-gray-600'}`}>📦 Por Fora</button>
               </div>
             </div>
 
@@ -208,19 +208,19 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Código do pedido iFood</label>
                   <input type="text" value={codigoIfood} onChange={e => setCodigoIfood(e.target.value.toUpperCase())}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                     placeholder="Ex: ABC-1234" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Endereço do cliente</label>
                   <AutocompleteInput value={enderecoIfood} onChange={setEnderecoIfood}
                     onBlur={(v) => v && calcularKmAuto(v)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                     placeholder="Ex: Rua XV de Novembro 123" />
                 </div>
                 {calculandoKm && (
                   <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
+                    <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
                     Calculando km...
                   </div>
                 )}
@@ -228,13 +228,13 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Distância (km)</label>
                     <input type="number" value={km} onChange={e => setKm(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                       placeholder="Ex: 4.5" step="0.1" min="0" />
                     <p className="text-xs text-amber-600 mt-1">📍 Informe o km manualmente</p>
                   </div>
                 )}
                 {!kmManual && km && !calculandoKm && (
-                  <div className="flex items-center gap-2 text-sm text-[#2B6344] bg-green-50 rounded-xl px-3 py-2">
+                  <div className="flex items-center gap-2 text-sm text-[#F7941D] bg-orange-50 rounded-xl px-3 py-2">
                     <span>📍</span><span className="font-semibold">{km} km</span>
                     <span className="text-gray-500">calculado automaticamente</span>
                     <button onClick={() => { setKm(''); setKmManual(true) }} className="ml-auto text-xs text-gray-400 underline">editar</button>
@@ -249,26 +249,26 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                 {!usandoEnderecoLivre ? (
                   <>
                     <select value={enderecoSelecionado} onChange={e => setEnderecoSelecionado(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50">
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50">
                       <option value="">Selecionar destino...</option>
                       {enderecosFavoritos.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
                     </select>
                     <button onClick={() => { setUsandoEnderecoLivre(true); setEnderecoSelecionado(''); setKm(''); setKmManual(false) }}
-                      className="text-sm text-[#2B6344] font-medium">+ Digitar outro endereço</button>
+                      className="text-sm text-[#F7941D] font-medium">+ Digitar outro endereço</button>
                   </>
                 ) : (
                   <>
                     <AutocompleteInput value={enderecoLivre} onChange={setEnderecoLivre}
                       onBlur={(v) => v && calcularKmAuto(v)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                       placeholder="Ex: Rua XV de Novembro 123, Curitiba" />
                     <button onClick={() => { setUsandoEnderecoLivre(false); setEnderecoLivre(''); setKm(''); setKmManual(false) }}
-                      className="text-sm text-[#2B6344] font-medium">← Usar destino salvo</button>
+                      className="text-sm text-[#F7941D] font-medium">← Usar destino salvo</button>
                   </>
                 )}
                 {calculandoKm && (
                   <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
+                    <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
                     Calculando km...
                   </div>
                 )}
@@ -276,13 +276,13 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Distância (km)</label>
                     <input type="number" value={km} onChange={e => setKm(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                       placeholder="Ex: 6.0" step="0.1" min="0" />
                     <p className="text-xs text-amber-600 mt-1">📍 Informe o km manualmente</p>
                   </div>
                 )}
                 {!kmManual && km && !calculandoKm && (
-                  <div className="flex items-center gap-2 text-sm text-[#2B6344] bg-green-50 rounded-xl px-3 py-2">
+                  <div className="flex items-center gap-2 text-sm text-[#F7941D] bg-orange-50 rounded-xl px-3 py-2">
                     <span>📍</span><span className="font-semibold">{km} km</span>
                     <span className="text-gray-500">calculado automaticamente</span>
                     <button onClick={() => { setKm(''); setKmManual(true) }} className="ml-auto text-xs text-gray-400 underline">editar</button>
@@ -292,16 +292,16 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
             )}
 
             {valorCalculado > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
+              <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
                 <div className="flex items-center justify-between">
-                  <div><p className="text-sm text-gray-600">Valor da corrida</p><p className="text-2xl font-bold text-[#2B6344]">{formatarValor(valorCalculado)}</p></div>
+                  <div><p className="text-sm text-gray-600">Valor da corrida</p><p className="text-2xl font-bold text-[#F7941D]">{formatarValor(valorCalculado)}</p></div>
                   <div className="text-right text-sm text-gray-500"><p>{kmNum.toFixed(1)} km</p></div>
                 </div>
               </div>
             )}
 
             <button onClick={salvarEntrega} disabled={!podeConfirmar || salvando || sucesso}
-              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-md ${sucesso ? 'bg-green-500 text-white' : podeConfirmar ? 'bg-[#2B6344] hover:bg-[#1e4d31] active:scale-95 text-white' : 'bg-gray-200 text-gray-400'}`}>
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-md ${sucesso ? 'bg-green-500 text-white' : podeConfirmar ? 'bg-[#F7941D] hover:bg-[#e07a0a] active:scale-95 text-white' : 'bg-gray-200 text-gray-400'}`}>
               {sucesso ? '✅ Entrega registrada!' : salvando ? 'Salvando...' : '✅ Confirmar entrega'}
             </button>
           </div>
@@ -316,7 +316,7 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                 <div className="flex justify-between text-sm"><span className="text-gray-500">Corridas ({entregas.length}x)</span><span className="font-semibold">{formatarValor(totalValor)}</span></div>
                 {temManha && <div className="flex justify-between text-sm"><span className="text-gray-500">Diária manhã 🌅</span><span className="font-semibold">{formatarValor(valorDiaria)}</span></div>}
                 {temNoite && <div className="flex justify-between text-sm"><span className="text-gray-500">Diária noite 🌙</span><span className="font-semibold">{formatarValor(DIARIA_NOITE_MOTOBOY)}</span></div>}
-                <div className="border-t border-gray-100 pt-2 flex justify-between"><span className="font-bold text-gray-800">Total do dia</span><span className="font-bold text-[#2B6344] text-lg">{formatarValor(totalDia)}</span></div>
+                <div className="border-t border-gray-100 pt-2 flex justify-between"><span className="font-bold text-gray-800">Total do dia</span><span className="font-bold text-[#F7941D] text-lg">{formatarValor(totalDia)}</span></div>
               </div>
             </div>
 
@@ -337,7 +337,7 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                     <p className="text-sm font-semibold text-gray-800 truncate">{e.endereco_destino}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{e.km_calculado ? `${e.km_calculado} km · ` : ''}{formatarDataBrasilia(e.created_at)}</p>
                   </div>
-                  <div className="text-right"><p className="font-bold text-[#2B6344]">{formatarValor(e.valor_km)}</p><p className="text-xs text-gray-400">#{entregas.length - i}</p></div>
+                  <div className="text-right"><p className="font-bold text-[#F7941D]">{formatarValor(e.valor_km)}</p><p className="text-xs text-gray-400">#{entregas.length - i}</p></div>
                 </div>
               ))
             )}
@@ -355,9 +355,9 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
               const diaDiarias = (diaManha ? valorDiaria : 0) + (diaNoite ? DIARIA_NOITE_MOTOBOY : 0)
               return (
                 <div key={dia} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 bg-green-50 border-b border-orange-100">
+                  <div className="flex items-center justify-between px-4 py-3 bg-orange-50 border-b border-orange-100">
                     <span className="font-semibold text-gray-800">📅 {dia}</span>
-                    <span className="text-sm font-bold text-[#2B6344]">{ents.length} entregas · {formatarValor(totalDiaHist + diaDiarias)}</span>
+                    <span className="text-sm font-bold text-[#F7941D]">{ents.length} entregas · {formatarValor(totalDiaHist + diaDiarias)}</span>
                   </div>
                   <div className="divide-y divide-gray-50">
                     {ents.map(e => (
@@ -367,7 +367,7 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
                           <p className="text-sm text-gray-800 truncate">{e.endereco_destino}</p>
                           <p className="text-xs text-gray-400">{e.km_calculado ? `${e.km_calculado} km · ` : ''}{formatarDataBrasilia(e.created_at)}</p>
                         </div>
-                        <p className="font-bold text-[#2B6344] text-sm">{formatarValor(e.valor_km)}</p>
+                        <p className="font-bold text-[#F7941D] text-sm">{formatarValor(e.valor_km)}</p>
                       </div>
                     ))}
                   </div>

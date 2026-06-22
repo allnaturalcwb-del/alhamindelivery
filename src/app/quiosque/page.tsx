@@ -1,4 +1,4 @@
-﻿import { createServiceClient } from '@/lib/supabase/service'
+import { createServiceClient } from '@/lib/supabase/service'
 import QuiosqueSelecaoClient from './QuiosqueSelecaoClient'
 
 type Profile = { id: string; nome: string; tipo: string }
@@ -15,7 +15,6 @@ export default async function QuiosquePage() {
       .from('profiles')
       .select('id, nome, tipo')
       .eq('role', 'motoboy')
-      .eq('ativo', true)
       .order('nome')
     motoboys = data || []
   } catch {
@@ -24,7 +23,7 @@ export default async function QuiosquePage() {
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY === 'COLE_AQUI_A_SERVICE_ROLE_KEY') {
     return (
-      <div className="min-h-screen bg-[#2B6344] flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[#F7941D] flex items-center justify-center p-8">
         <div className="bg-white rounded-3xl p-8 max-w-sm text-center shadow-2xl">
           <div className="text-5xl mb-4">⚙️</div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Configuração necessária</h2>

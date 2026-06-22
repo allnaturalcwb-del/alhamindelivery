@@ -1,4 +1,4 @@
-﻿import { formatarPeriodo, type Quinzena } from './quinzena'
+import { formatarPeriodo, type Quinzena } from './quinzena'
 import { contarDiasAtivosPorTurno } from './turno'
 
 type Motoboy = { id: string; nome: string; tipo: string; valor_diaria: number }
@@ -72,7 +72,7 @@ export function gerarHTMLRelatorio(
       <td style="padding:10px 12px;border-bottom:1px solid #f0e0d0;text-align:center;font-size:12px">${m.diasManha > 0 ? `${m.diasManha}x manhã R$${m.diaria}` : ''}${m.diasManha > 0 && m.diasNoite > 0 ? '<br>' : ''}${m.diasNoite > 0 ? `${m.diasNoite}x noite R$${m.diariaNoite}` : ''}</td>
       <td style="padding:10px 12px;border-bottom:1px solid #f0e0d0;text-align:right">R$ ${m.totalCorridas.toFixed(2).replace('.', ',')}</td>
       <td style="padding:10px 12px;border-bottom:1px solid #f0e0d0;text-align:right">R$ ${m.totalDiarias.toFixed(2).replace('.', ',')}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0e0d0;text-align:right;font-weight:700;color:#2B6344">R$ ${m.totalAPagar.toFixed(2).replace('.', ',')}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #f0e0d0;text-align:right;font-weight:700;color:#F7941D">R$ ${m.totalAPagar.toFixed(2).replace('.', ',')}</td>
     </tr>
   `).join('')
 
@@ -80,18 +80,18 @@ export function gerarHTMLRelatorio(
     <!DOCTYPE html>
     <html>
     <head><meta charset="UTF-8"></head>
-    <body style="margin:0;padding:0;background:#F5F0E6;font-family:Arial,sans-serif">
+    <body style="margin:0;padding:0;background:#FFF8F0;font-family:Arial,sans-serif">
       <div style="max-width:680px;margin:0 auto;padding:24px">
 
         <div style="background:#1C1C1C;border-radius:12px 12px 0 0;padding:20px 24px;display:flex;align-items:center;gap:12px">
-          <span style="font-size:28px">🌿</span>
+          <span style="font-size:28px">🥕</span>
           <div>
-            <div style="color:#2B6344;font-weight:800;font-size:18px;letter-spacing:1px">AL'HAMIN</div>
+            <div style="color:#F7941D;font-weight:800;font-size:18px;letter-spacing:1px">ALL NATURAL BATEL</div>
             <div style="color:#999;font-size:12px">Resumo Quinzenal Motoboys</div>
           </div>
         </div>
 
-        <div style="background:#2B6344;padding:16px 24px">
+        <div style="background:#F7941D;padding:16px 24px">
           <div style="color:white;font-weight:700;font-size:16px">${titulo}</div>
           <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:2px">Período: ${periodo}</div>
           ${modo === 'admin' ? '<div style="background:rgba(0,0,0,0.2);color:white;font-size:11px;padding:4px 10px;border-radius:20px;display:inline-block;margin-top:6px">🔒 Versão confidencial — apenas administradores</div>' : ''}
@@ -100,14 +100,14 @@ export function gerarHTMLRelatorio(
         <div style="background:white;padding:8px 0">
           <table style="width:100%;border-collapse:collapse;font-size:13px">
             <thead>
-              <tr style="background:#F5F0E6">
-                <th style="padding:10px 12px;text-align:left;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Motoboy</th>
-                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Tipo</th>
-                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Entregas</th>
-                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Diárias</th>
-                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Corridas</th>
-                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Diárias R$</th>
-                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #2B6344">Total</th>
+              <tr style="background:#FFF8F0">
+                <th style="padding:10px 12px;text-align:left;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Motoboy</th>
+                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Tipo</th>
+                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Entregas</th>
+                <th style="padding:10px 12px;text-align:center;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Diárias</th>
+                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Corridas</th>
+                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Diárias R$</th>
+                <th style="padding:10px 12px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #F7941D">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -121,11 +121,11 @@ export function gerarHTMLRelatorio(
             <div style="color:#999;font-size:12px">${linhas.length} motoboys · ${linhas.reduce((s, m) => s + m.entregas, 0)} entregas</div>
             <div style="color:white;font-weight:600;font-size:13px">Total geral da quinzena</div>
           </div>
-          <div style="color:#2B6344;font-weight:800;font-size:22px">R$ ${totalGeral.toFixed(2).replace('.', ',')}</div>
+          <div style="color:#F7941D;font-weight:800;font-size:22px">R$ ${totalGeral.toFixed(2).replace('.', ',')}</div>
         </div>
 
         <div style="text-align:center;padding:16px;color:#bbb;font-size:11px">
-          Gerado automaticamente pelo sistema Al'hamin Delivery Control
+          Gerado automaticamente pelo sistema All Natural Delivery Control
         </div>
       </div>
     </body>

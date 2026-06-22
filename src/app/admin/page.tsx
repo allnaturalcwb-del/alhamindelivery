@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import AdminClient from './AdminClient'
 
 export default async function AdminPage() {
@@ -7,7 +8,8 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  const db = createServiceClient()
+  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single()
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   const agora = new Date()
@@ -17,17 +19,17 @@ export default async function AdminPage() {
   const diaStr = agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }) // "YYYY-MM-DD"
   const hoje = new Date(new Date(diaStr + 'T00:00:00Z').getTime() + offsetMs)
 
-  const { data: entregasHoje } = await supabase
+  const { data: entregasHoje } = await db
     .from('entregas_completas').select('*')
     .gte('created_at', hoje.toISOString()).order('created_at', { ascending: false })
 
-  const { data: todasEntregas } = await supabase
+  const { data: todasEntregas } = await db
     .from('entregas_completas').select('*')
     .order('created_at', { ascending: false })
     .limit(500)
 
-  const { data: motoboys } = await supabase.from('profiles').select('*').eq('role', 'motoboy').order('nome')
-  const { data: enderecos } = await supabase.from('enderecos_favoritos').select('*').order('nome')
+  const { data: motoboys } = await db.from('profiles').select('*').eq('role', 'motoboy').order('nome')
+  const { data: enderecos } = await db.from('enderecos_favoritos').select('*').order('nome')
 
   return <AdminClient
     profile={profile}

@@ -1,10 +1,10 @@
-﻿'use client'
+'use client'
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { formatarValor } from '@/lib/km'
 import { useRouter } from 'next/navigation'
-import { LogOut, Users, MapPin, BarChart3, RefreshCw, Plus, Trash2, Calendar, FileText, Pencil, Check, X, Upload, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { LogOut, Users, MapPin, BarChart3, RefreshCw, Plus, Trash2, Calendar, FileText, Pencil, Check, X, Upload, AlertTriangle, CheckCircle2, CreditCard, ExternalLink } from 'lucide-react'
 import AutocompleteInput from '@/components/AutocompleteInput'
 import { getQuinzenaComOffset, formatarPeriodo, type Quinzena } from '@/lib/quinzena'
 import { gerarRelatorio } from '@/lib/relatorio'
@@ -64,7 +64,21 @@ function getInicioSemana(offset = 0): Date {
 }
 
 export default function AdminClient({ profile, entregasIniciais, todasEntregas, motoboysList, enderecosList }: Props) {
-  const [aba, setAba] = useState<'entregas' | 'historico' | 'relatorio' | 'quinzena' | 'motoboys' | 'enderecos'>('entregas')
+  const [aba, setAba] = useState<'entregas' | 'historico' | 'relatorio' | 'quinzena' | 'motoboys' | 'enderecos' | 'assinatura'>('entregas')
+
+  // Aba Assinatura — estado
+  const [assCpfCnpj, setAssCpfCnpj] = useState('')
+  const [assNome, setAssNome] = useState('')
+  const [assEmail, setAssEmail] = useState('')
+  const [assTelefone, setAssTelefone] = useState('')
+  const [assPlano, setAssPlano] = useState<'custom'>('custom')
+  const [assValorImpl, setAssValorImpl] = useState('147')
+  const [assValorMens, setAssValorMens] = useState('197')
+  const [assLoading, setAssLoading] = useState(false)
+  const [assResultado, setAssResultado] = useState<Record<string, unknown> | null>(null)
+  const [assErro, setAssErro] = useState('')
+  const [assStatusData, setAssStatusData] = useState<Record<string, unknown> | null>(null)
+  const [assStatusLoading, setAssStatusLoading] = useState(false)
   const [entregas, setEntregas] = useState<Entrega[]>(entregasIniciais)
   const [todasEntregasState, setTodasEntregasState] = useState<Entrega[]>(todasEntregas)
   const [excluindoEntregaId, setExcluindoEntregaId] = useState<string | null>(null)
@@ -78,6 +92,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
   const [editNome, setEditNome] = useState('')
   const [editCompleto, setEditCompleto] = useState('')
   const [editandoEntrega, setEditandoEntrega] = useState<string | null>(null)
+  const [popupMotoboys, setPopupMotoboys] = useState(false)
   const [editEnderecoEntrega, setEditEnderecoEntrega] = useState('')
   const [salvandoEntregaId, setSalvandoEntregaId] = useState<string | null>(null)
   const [novoNome, setNovoNome] = useState('')
@@ -327,13 +342,13 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
   const labelSemana = semanaOffset === 0 ? 'Semana atual' : semanaOffset === -1 ? 'Semana passada' : `Semana ${semanaOffset}`
 
   return (
-    <div className="min-h-screen bg-[#F5F0E6]">
+    <div className="min-h-screen bg-[#FFF8F0]">
       {/* Header */}
       <header className="bg-[#1C1C1C] text-white px-4 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <img src="/logo-alhamin.svg" alt={tenant.nome} className="w-8 h-8 rounded-lg" />
+          <div className="w-8 h-8 bg-[#F7941D] rounded-lg flex items-center justify-center text-lg">🥕</div>
           <div>
-            <div className="font-bold text-sm leading-tight">AL&apos;HAMIN</div>
+            <div className="font-bold text-sm leading-tight">ALL NATURAL</div>
             <div className="text-gray-400 text-xs">Admin · {profile.nome.split(' ')[0]}</div>
           </div>
         </div>
@@ -348,14 +363,39 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
             <p className="text-2xl font-bold">{entregas.length}</p>
             <p className="text-xs text-gray-500">{totalKm.toFixed(1)} km</p>
           </div>
-          <div className="bg-white/10 rounded-xl p-3 text-white">
-            <p className="text-xs text-gray-400">Motoboys</p>
-            <p className="text-2xl font-bold">{motoboys.filter(m => m.ativo !== false).length}</p>
-            <p className="text-xs text-gray-500">ativos agora</p>
+          <div className="relative">
+            <button
+              onClick={() => setPopupMotoboys(v => !v)}
+              className="bg-white/10 rounded-xl p-3 text-white w-full text-left active:bg-white/20 transition-colors"
+            >
+              <p className="text-xs text-gray-400">Motoboys</p>
+              <p className="text-2xl font-bold">{motoboys.filter(m => m.ativo !== false).length}</p>
+              <p className="text-xs text-gray-500">ativos agora ▾</p>
+            </button>
+            {popupMotoboys && (
+              <>
+                {/* overlay transparente para fechar */}
+                <div className="fixed inset-0 z-10" onClick={() => setPopupMotoboys(false)} />
+                <div className="absolute left-0 top-full mt-1 z-20 bg-white rounded-2xl shadow-2xl border border-gray-100 min-w-[160px] py-2 overflow-hidden">
+                  {motoboys.filter(m => m.ativo !== false).length === 0 && (
+                    <p className="text-xs text-gray-400 px-4 py-2">Nenhum ativo</p>
+                  )}
+                  {motoboys.filter(m => m.ativo !== false).map(m => (
+                    <div key={m.id} className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+                      <span className="text-base">🛵</span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800 leading-tight">{m.nome}</p>
+                        <p className="text-xs text-gray-400">{m.tipo === 'fixo' ? 'Fixo' : 'Avulso'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-white">
             <p className="text-xs text-gray-400">Custo</p>
-            <p className="text-xl font-bold text-[#EDD9A3]">{formatarValor(totalValorCorridas + totalDiarias)}</p>
+            <p className="text-xl font-bold text-[#F7941D]">{formatarValor(totalValorCorridas + totalDiarias)}</p>
             <p className="text-xs text-gray-500">corridas+diárias</p>
           </div>
         </div>
@@ -370,9 +410,10 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
           { key: 'quinzena', icon: <Calendar size={13} />, label: 'Quinzena' },
           { key: 'motoboys', icon: <Users size={13} />, label: 'Motoboys' },
           { key: 'enderecos', icon: <MapPin size={13} />, label: 'Endereços' },
+          { key: 'assinatura', icon: <CreditCard size={13} />, label: 'Assinatura' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setAba(tab.key as typeof aba)}
-            className={`flex-shrink-0 px-3 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === tab.key ? 'border-[#2B6344] text-[#2B6344]' : 'border-transparent text-gray-400'}`}>
+            className={`flex-shrink-0 px-3 py-3 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition-colors ${aba === tab.key ? 'border-[#F7941D] text-[#F7941D]' : 'border-transparent text-gray-400'}`}>
             {tab.icon} {tab.label}
           </button>
         ))}
@@ -389,7 +430,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                   <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Próximo pagamento</p>
                   <p className="text-sm font-bold text-gray-800">{p.dataFmt} <span className="font-normal text-gray-400">({p.semanaFmt})</span></p>
                 </div>
-                <div className={`text-xs font-bold px-3 py-1.5 rounded-full ${p.dias <= 3 ? 'bg-[#EDD9A3] text-[#2B6344]' : 'bg-gray-100 text-gray-500'}`}>
+                <div className={`text-xs font-bold px-3 py-1.5 rounded-full ${p.dias <= 3 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
                   {p.dias === 0 ? 'hoje' : p.dias === 1 ? 'amanhã' : `em ${p.dias} dias`}
                 </div>
               </div>
@@ -404,7 +445,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div><p className="font-semibold text-gray-800">🛵 {m.nome}</p><p className="text-xs text-gray-400">{m.tipo} · {m.entregas.length} entregas · {m.totalKm.toFixed(1)} km</p></div>
-                  <div className="text-right"><p className="font-bold text-[#2B6344]">{formatarValor(m.totalValor + m.diaria)}</p><p className="text-xs text-gray-400">diária + corridas</p></div>
+                  <div className="text-right"><p className="font-bold text-[#F7941D]">{formatarValor(m.totalValor + m.diaria)}</p><p className="text-xs text-gray-400">diária + corridas</p></div>
                 </div>
                 {m.entregas.length === 0 ? <p className="text-xs text-gray-400 italic">Nenhuma entrega ainda</p> : (
                   <div className="space-y-1">
@@ -412,14 +453,14 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                       editandoEntrega === e.id ? (
                         <div key={e.id} className="flex items-center gap-1 py-1">
                           <input type="text" value={editEnderecoEntrega} onChange={ev => setEditEnderecoEntrega(ev.target.value)}
-                            className="flex-1 border border-[#2B6344] rounded-lg px-2 py-1 text-xs focus:outline-none bg-green-50" />
+                            className="flex-1 border border-[#F7941D] rounded-lg px-2 py-1 text-xs focus:outline-none bg-orange-50" />
                           <button onClick={() => salvarEdicaoEntrega(e.id)} className="text-green-600 shrink-0"><Check size={16} /></button>
                           <button onClick={() => setEditandoEntrega(null)} className="text-gray-400 shrink-0"><X size={16} /></button>
                         </div>
                       ) : (
                         <div key={e.id} className="flex items-center justify-between text-xs group">
                           <span className="text-gray-500 truncate flex-1 mr-2">{e.tipo === 'ifood' ? '🛍️' : '📦'} {e.endereco_destino}</span>
-                          <button onClick={() => iniciarEdicaoEntrega(e)} className="text-gray-300 hover:text-[#2B6344] shrink-0 mr-2"><Pencil size={12} /></button>
+                          <button onClick={() => iniciarEdicaoEntrega(e)} className="text-gray-300 hover:text-[#F7941D] shrink-0 mr-2"><Pencil size={12} /></button>
                           <button onClick={() => excluirEntrega(e)} disabled={excluindoEntregaId === e.id} className="text-gray-300 hover:text-red-500 shrink-0 mr-2"><Trash2 size={12} /></button>
                           {salvandoEntregaId === e.id || excluindoEntregaId === e.id ? (
                             <span className="text-gray-400 shrink-0 italic">{excluindoEntregaId === e.id ? 'excluindo...' : 'recalculando...'}</span>
@@ -456,7 +497,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
 
               return (
                 <div key={dia} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 bg-green-50 border-b border-orange-100">
+                  <div className="flex items-center justify-between px-4 py-3 bg-orange-50 border-b border-orange-100">
                     <span className="font-semibold text-gray-800">📅 {dia}</span>
                     <span className="text-sm text-gray-500">{ents.length} entregas · {totalDiaKm.toFixed(1)} km · {formatarValor(totalDiaValor)}</span>
                   </div>
@@ -470,7 +511,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                             {' · diária '}{formatarValor(m.totalDiarias)}
                           </span>
                         </div>
-                        <span className="text-sm font-bold text-[#2B6344]">{formatarValor(m.total + m.totalDiarias)}</span>
+                        <span className="text-sm font-bold text-[#F7941D]">{formatarValor(m.total + m.totalDiarias)}</span>
                       </div>
                       <div className="px-4 pb-2 space-y-1">
                         {m.ents.map(e => (
@@ -509,17 +550,17 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                   className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 disabled:opacity-30">→</button>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="bg-green-50 rounded-xl p-2">
+                <div className="bg-orange-50 rounded-xl p-2">
                   <p className="text-gray-500">Entregas</p>
-                  <p className="font-bold text-lg text-[#2B6344]">{entregasSemana.length}</p>
+                  <p className="font-bold text-lg text-[#F7941D]">{entregasSemana.length}</p>
                 </div>
-                <div className="bg-green-50 rounded-xl p-2">
+                <div className="bg-orange-50 rounded-xl p-2">
                   <p className="text-gray-500">Dias</p>
-                  <p className="font-bold text-lg text-[#2B6344]">{diasSemana}</p>
+                  <p className="font-bold text-lg text-[#F7941D]">{diasSemana}</p>
                 </div>
-                <div className="bg-green-50 rounded-xl p-2">
+                <div className="bg-orange-50 rounded-xl p-2">
                   <p className="text-gray-500">Total</p>
-                  <p className="font-bold text-lg text-[#2B6344]">{formatarValor(totalGeralSemana).replace('R$ ', '')}</p>
+                  <p className="font-bold text-lg text-[#F7941D]">{formatarValor(totalGeralSemana).replace('R$ ', '')}</p>
                 </div>
               </div>
             </div>
@@ -536,7 +577,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                         <p className="text-xs text-gray-400">{m.ents.length} entregas · {m.diasAtivos} dias · {m.totalKmM.toFixed(1)} km</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xl font-black text-[#2B6344]">{formatarValor(m.totalAPagar)}</p>
+                        <p className="text-xl font-black text-[#F7941D]">{formatarValor(m.totalAPagar)}</p>
                         <p className="text-xs text-gray-400">a pagar</p>
                       </div>
                     </div>
@@ -566,7 +607,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                       <p className="font-bold text-white">Total geral da semana</p>
                       <p className="text-xs text-gray-400">{relatorioMotoboys.length} motoboys · {entregasSemana.length} entregas</p>
                     </div>
-                    <p className="text-2xl font-black text-[#2B6344]">{formatarValor(totalGeralSemana)}</p>
+                    <p className="text-2xl font-black text-[#F7941D]">{formatarValor(totalGeralSemana)}</p>
                   </div>
                 </div>
               </>
@@ -586,7 +627,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                 <div className="text-center">
                   <p className="text-white font-bold text-sm">{quinzenaSelecionada.label}</p>
                   <p className="text-gray-400 text-xs mt-0.5">{formatarPeriodo(quinzenaSelecionada)}</p>
-                  {quinzenaOffset === 0 && <span className="text-[10px] bg-[#2B6344] text-white px-2 py-0.5 rounded-full mt-1 inline-block">Atual</span>}
+                  {quinzenaOffset === 0 && <span className="text-[10px] bg-[#F7941D] text-white px-2 py-0.5 rounded-full mt-1 inline-block">Atual</span>}
                 </div>
                 <button onClick={() => mudarQuinzena(quinzenaOffset + 1)} disabled={quinzenaOffset >= 0}
                   className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20">→</button>
@@ -618,14 +659,14 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                           <p className="text-xs text-gray-400">{m.entregas} entregas · {m.diasAtivos} dias · diária R${m.diaria}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#2B6344]">{formatarValor(m.totalAPagar)}</p>
+                          <p className="font-bold text-[#F7941D]">{formatarValor(m.totalAPagar)}</p>
                           <p className="text-xs text-gray-400">corridas + diárias</p>
                         </div>
                       </div>
                     ))}
                     <div className="flex items-center justify-between pt-2 mt-1 border-t border-orange-100">
                       <p className="font-bold text-gray-800 text-sm">Total geral</p>
-                      <p className="font-black text-[#2B6344] text-lg">{formatarValor(totalGeral)}</p>
+                      <p className="font-black text-[#F7941D] text-lg">{formatarValor(totalGeral)}</p>
                     </div>
                   </div>
                 )
@@ -637,7 +678,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <h3 className="font-semibold text-gray-800 mb-1 flex items-center gap-2"><Upload size={15} /> Cruzamento iFood</h3>
               <p className="text-xs text-gray-400 mb-3">Baixe o relatório de pedidos do iFood e faça o upload para conferir se os números batem com o sistema.</p>
 
-              <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-xl p-4 cursor-pointer transition-colors ${quinzenaArquivo ? 'border-[#2B6344] bg-green-50' : 'border-gray-200 hover:border-[#2B6344]'}`}>
+              <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-xl p-4 cursor-pointer transition-colors ${quinzenaArquivo ? 'border-[#F7941D] bg-orange-50' : 'border-gray-200 hover:border-[#F7941D]'}`}>
                 <input type="file" accept=".xlsx,.xls,.csv" className="hidden"
                   onChange={e => { setQuinzenaArquivo(e.target.files?.[0] || null); setQuinzenaCruzamento(null) }} />
                 <Upload size={16} className="text-gray-400" />
@@ -674,12 +715,12 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
                 <CheckCircle2 size={24} className="text-green-600 mx-auto mb-2" />
                 <p className="font-bold text-green-700">Relatórios enviados!</p>
-                <p className="text-xs text-gray-500 mt-1">Dois emails enviados para PREENCHER_EMAIL</p>
+                <p className="text-xs text-gray-500 mt-1">Dois emails enviados para allnatural.cwb@gmail.com</p>
                 <button onClick={() => setQuinzenaEnviado(false)} className="mt-3 text-xs text-gray-400 underline">Enviar novamente</button>
               </div>
             ) : (
               <button onClick={enviarRelatorios} disabled={quinzenaEnviando}
-                className="w-full bg-[#2B6344] hover:bg-[#1e4d31] disabled:bg-gray-200 disabled:text-gray-400 text-white py-4 rounded-2xl font-bold text-base transition-colors shadow-sm active:scale-95">
+                className="w-full bg-[#F7941D] hover:bg-[#e07a0a] disabled:bg-gray-200 disabled:text-gray-400 text-white py-4 rounded-2xl font-bold text-base transition-colors shadow-sm active:scale-95">
                 {quinzenaEnviando ? 'Enviando relatórios...' : '📧 Fechar quinzena e enviar relatórios'}
               </button>
             )}
@@ -706,36 +747,42 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
         {/* ABA MOTOBOYS */}
         {aba === 'motoboys' && (
           <div className="space-y-4">
-            {/* Ativos */}
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Rodando agora ✅</p>
-              <div className="space-y-2">
-                {motoboys.filter(m => m.ativo !== false).map(m => (
-                  <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Info */}
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 text-xs text-blue-700 leading-relaxed">
+              <strong>Ativo</strong> = rodando hoje · <strong>Pausado</strong> = na base mas fora de operação<br />
+              A escala de cada turno é definida no quiosque (aparece toda a base).
+            </div>
+
+            {/* Lista unificada */}
+            <div className="space-y-2">
+              {[...motoboys].sort((a, b) => (a.ativo === false ? 1 : -1) - (b.ativo === false ? 1 : -1)).map(m => {
+                const pausado = m.ativo === false
+                return (
+                  <div key={m.id} className={`bg-white rounded-2xl p-4 shadow-sm transition-opacity ${pausado && editandoMotoboy !== m.id ? 'opacity-50' : ''}`}>
                     {editandoMotoboy === m.id ? (
                       <div className="space-y-3">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editando motoboy</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editando</p>
                         <input type="text" value={editMotoboyNome} onChange={e => setEditMotoboyNome(e.target.value)}
-                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]"
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D]"
                           placeholder="Nome" />
                         <div className="flex gap-2">
                           <button onClick={() => setEditMotoboyTipo('fixo')}
-                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'fixo' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'fixo' ? 'bg-[#F7941D] text-white border-[#F7941D]' : 'bg-white text-gray-600 border-gray-200'}`}>
                             Fixo
                           </button>
                           <button onClick={() => setEditMotoboyTipo('avulso')}
-                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'avulso' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'avulso' ? 'bg-[#F7941D] text-white border-[#F7941D]' : 'bg-white text-gray-600 border-gray-200'}`}>
                             Avulso
                           </button>
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 mb-1 ml-1">Diária (R$)</label>
                           <input type="number" value={editMotoboyDiaria} onChange={e => setEditMotoboyDiaria(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]" />
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D]" />
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => salvarEdicaoMotoboy(m.id)} disabled={salvandoEdicaoMotoboy}
-                            className="flex-1 py-2 bg-[#2B6344] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
+                            className="flex-1 py-2 bg-[#F7941D] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
                             {salvandoEdicaoMotoboy ? 'Salvando...' : 'Salvar'}
                           </button>
                           <button onClick={() => setEditandoMotoboy(null)}
@@ -745,90 +792,46 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-800 truncate">🛵 {m.nome}</p>
                           <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}
                             className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
                             ✏️
                           </button>
-                          <button onClick={() => toggleMotoboy(m.id, false)}
-                            className="text-xs bg-red-50 text-red-500 border border-red-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
-                            Pausar
-                          </button>
+                          {pausado ? (
+                            <>
+                              <button onClick={() => toggleMotoboy(m.id, true)}
+                                className="text-xs bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                                Ativar
+                              </button>
+                              {m.tipo === 'avulso' && (
+                                <button onClick={async () => {
+                                  if (!confirm(`Apagar ${m.nome} da base? Esta ação não pode ser desfeita.`)) return
+                                  await supabase.from('profiles').delete().eq('id', m.id)
+                                  setMotoboys(prev => prev.filter(x => x.id !== m.id))
+                                }}
+                                  className="text-xs bg-red-50 text-red-500 border border-red-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                                  🗑
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <button onClick={() => toggleMotoboy(m.id, false)}
+                              className="text-xs bg-orange-50 text-orange-500 border border-orange-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                              Pausar
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
+                )
+              })}
             </div>
-
-            {/* Pausados */}
-            {motoboys.filter(m => m.ativo === false).length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Pausados ⏸</p>
-                <div className="space-y-2">
-                  {motoboys.filter(m => m.ativo === false).map(m => (
-                    <div key={m.id} className={`bg-white rounded-2xl p-4 shadow-sm ${editandoMotoboy !== m.id ? 'opacity-60' : ''}`}>
-                      {editandoMotoboy === m.id ? (
-                        <div className="space-y-3">
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editando motoboy</p>
-                          <input type="text" value={editMotoboyNome} onChange={e => setEditMotoboyNome(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]"
-                            placeholder="Nome" />
-                          <div className="flex gap-2">
-                            <button onClick={() => setEditMotoboyTipo('fixo')}
-                              className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'fixo' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
-                              Fixo
-                            </button>
-                            <button onClick={() => setEditMotoboyTipo('avulso')}
-                              className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'avulso' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
-                              Avulso
-                            </button>
-                          </div>
-                          <div>
-                            <label className="block text-xs text-gray-500 mb-1 ml-1">Diária (R$)</label>
-                            <input type="number" value={editMotoboyDiaria} onChange={e => setEditMotoboyDiaria(e.target.value)}
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]" />
-                          </div>
-                          <div className="flex gap-2">
-                            <button onClick={() => salvarEdicaoMotoboy(m.id)} disabled={salvandoEdicaoMotoboy}
-                              className="flex-1 py-2 bg-[#2B6344] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
-                              {salvandoEdicaoMotoboy ? 'Salvando...' : 'Salvar'}
-                            </button>
-                            <button onClick={() => setEditandoMotoboy(null)}
-                              className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold active:scale-95 transition-transform">
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
-                            <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}
-                              className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
-                              ✏️
-                            </button>
-                            <button onClick={() => toggleMotoboy(m.id, true)}
-                              className="text-xs bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
-                              Ativar
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Formulário novo motoboy - simplificado */}
             <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -836,35 +839,35 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <button onClick={() => setNovoTipo('fixo')}
-                    className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${novoTipo === 'fixo' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                    className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${novoTipo === 'fixo' ? 'bg-[#F7941D] text-white border-[#F7941D]' : 'bg-white text-gray-600 border-gray-200'}`}>
                     Fixo · R$40/dia
                   </button>
                   <button onClick={() => setNovoTipo('avulso')}
-                    className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${novoTipo === 'avulso' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                    className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${novoTipo === 'avulso' ? 'bg-[#F7941D] text-white border-[#F7941D]' : 'bg-white text-gray-600 border-gray-200'}`}>
                     Avulso · R$30/dia
                   </button>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1 ml-1">Nome completo</label>
                   <input type="text" value={novoNome} onChange={e => setNovoNome(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                     placeholder="Ex: João Silva" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1 ml-1">Email</label>
                   <input type="email" value={novoEmail} onChange={e => setNovoEmail(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                     placeholder="Ex: joao@allnatural.com" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1 ml-1">Senha inicial</label>
                   <input type="password" value={novaSenha} onChange={e => setNovaSenha(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                     placeholder="Padrão: 123456" />
                 </div>
                 {erroMotoboy && <p className="text-red-600 text-xs">{erroMotoboy}</p>}
                 <button onClick={criarMotoboy} disabled={salvandoMotoboy || !novoNome || !novoEmail || !novaSenha}
-                  className="w-full bg-[#2B6344] hover:bg-[#1e4d31] disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
+                  className="w-full bg-[#F7941D] hover:bg-[#e07a0a] disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
                   {salvandoMotoboy ? 'Criando...' : '+ Adicionar motoboy'}
                 </button>
               </div>
@@ -882,12 +885,12 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                     // Modo edição inline
                     <div className="space-y-2">
                       <input type="text" value={editNome} onChange={ev => setEditNome(ev.target.value)}
-                        className="w-full border border-[#2B6344] rounded-xl px-3 py-2 text-sm focus:outline-none bg-green-50 font-semibold" />
+                        className="w-full border border-[#F7941D] rounded-xl px-3 py-2 text-sm focus:outline-none bg-orange-50 font-semibold" />
                       <AutocompleteInput value={editCompleto} onChange={setEditCompleto}
-                        className="w-full border border-[#2B6344] rounded-xl px-3 py-2 text-sm focus:outline-none bg-green-50" />
+                        className="w-full border border-[#F7941D] rounded-xl px-3 py-2 text-sm focus:outline-none bg-orange-50" />
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => salvarEdicao(e.id)}
-                          className="flex-1 flex items-center justify-center gap-1 bg-[#2B6344] text-white py-2 rounded-xl text-sm font-semibold">
+                          className="flex-1 flex items-center justify-center gap-1 bg-[#F7941D] text-white py-2 rounded-xl text-sm font-semibold">
                           <Check size={14} /> Salvar
                         </button>
                         <button onClick={() => setEditandoEnd(null)}
@@ -905,7 +908,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                       </div>
                       {e.ativo && (
                         <div className="flex items-center gap-1">
-                          <button onClick={() => iniciarEdicao(e)} className="p-2 text-gray-400 hover:text-[#2B6344]"><Pencil size={15} /></button>
+                          <button onClick={() => iniciarEdicao(e)} className="p-2 text-gray-400 hover:text-[#F7941D]"><Pencil size={15} /></button>
                           <button onClick={() => removerEndereco(e.id)} className="p-2 text-gray-400 hover:text-red-500"><Trash2 size={15} /></button>
                         </div>
                       )}
@@ -917,14 +920,168 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
             <div className="bg-white rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><Plus size={16} /> Novo endereço favorito</h3>
               <div className="space-y-3">
-                <input type="text" value={novoEndNome} onChange={e => setNovoEndNome(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50" placeholder="Nome (ex: Loja da Thaty)" />
-                <AutocompleteInput value={novoEndCompleto} onChange={setNovoEndCompleto} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50" placeholder="Endereço completo com bairro e cidade" />
+                <input type="text" value={novoEndNome} onChange={e => setNovoEndNome(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" placeholder="Nome (ex: Loja da Thaty)" />
+                <AutocompleteInput value={novoEndCompleto} onChange={setNovoEndCompleto} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" placeholder="Endereço completo com bairro e cidade" />
                 <button onClick={adicionarEndereco} disabled={salvandoEnd || !novoEndNome || !novoEndCompleto}
-                  className="w-full bg-[#2B6344] hover:bg-[#1e4d31] disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
+                  className="w-full bg-[#F7941D] hover:bg-[#e07a0a] disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
                   {salvandoEnd ? 'Salvando...' : 'Adicionar endereço'}
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ABA ASSINATURA */}
+        {aba === 'assinatura' && (
+          <div className="space-y-4">
+
+            {/* Card: Gerar Cobrança */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <CreditCard size={16} className="text-[#F7941D]" /> Gerar cobrança Asaas
+              </h3>
+              <div className="space-y-2">
+                <input value={assNome} onChange={e => setAssNome(e.target.value)}
+                  placeholder="Nome do cliente" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                <input value={assCpfCnpj} onChange={e => setAssCpfCnpj(e.target.value)}
+                  placeholder="CPF ou CNPJ (só números)" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                <input value={assEmail} onChange={e => setAssEmail(e.target.value)}
+                  placeholder="E-mail (opcional)" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                <input value={assTelefone} onChange={e => setAssTelefone(e.target.value)}
+                  placeholder="WhatsApp (opcional)" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-gray-500 ml-1">Implantação (R$)</label>
+                    <input value={assValorImpl} onChange={e => setAssValorImpl(e.target.value)} type="number"
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 ml-1">Mensalidade (R$)</label>
+                    <input value={assValorMens} onChange={e => setAssValorMens(e.target.value)} type="number"
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                  </div>
+                </div>
+
+                {assErro && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-600 flex items-center gap-2">
+                    <AlertTriangle size={13} /> {assErro}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    disabled={assLoading || !assNome || !assCpfCnpj}
+                    onClick={async () => {
+                      setAssLoading(true); setAssErro(''); setAssResultado(null)
+                      try {
+                        const r = await fetch('/api/asaas/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ tipo: 'implantacao', nome: assNome, cpfCnpj: assCpfCnpj, email: assEmail, telefone: assTelefone, plano: assPlano, valorCustom: parseFloat(assValorImpl), descricaoCustom: 'Rota Simples — Implantação 3 unidades' }) })
+                        const data = await r.json()
+                        if (!r.ok) throw new Error(data.error)
+                        setAssResultado(data)
+                      } catch(e: unknown) { setAssErro(e instanceof Error ? e.message : 'Erro') }
+                      finally { setAssLoading(false) }
+                    }}
+                    className="bg-[#F7941D] hover:bg-[#e07a0a] disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
+                    {assLoading ? 'Gerando...' : 'Cobrar implantação'}
+                  </button>
+                  <button
+                    disabled={assLoading || !assNome || !assCpfCnpj}
+                    onClick={async () => {
+                      setAssLoading(true); setAssErro(''); setAssResultado(null)
+                      try {
+                        const r = await fetch('/api/asaas/cobranca', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ tipo: 'mensalidade', nome: assNome, cpfCnpj: assCpfCnpj, email: assEmail, telefone: assTelefone, plano: assPlano, valorCustom: parseFloat(assValorMens), descricaoCustom: 'Rota Simples — Mensalidade 3 unidades' }) })
+                        const data = await r.json()
+                        if (!r.ok) throw new Error(data.error)
+                        setAssResultado(data)
+                      } catch(e: unknown) { setAssErro(e instanceof Error ? e.message : 'Erro') }
+                      finally { setAssLoading(false) }
+                    }}
+                    className="bg-green-500 hover:bg-green-600 disabled:bg-gray-200 disabled:text-gray-400 text-white py-3 rounded-xl font-semibold text-sm transition-colors">
+                    {assLoading ? 'Gerando...' : 'Criar mensalidade'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Resultado da cobrança gerada */}
+              {assResultado && (
+                <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-green-700 font-semibold text-sm">
+                    <CheckCircle2 size={16} /> Cobrança gerada com sucesso!
+                  </div>
+                  {(assResultado.links as Record<string, string>)?.pixCopiaECola && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Pix Copia e Cola:</p>
+                      <div className="bg-white border rounded-lg p-2 text-xs font-mono break-all text-gray-700 select-all">
+                        {(assResultado.links as Record<string, string>).pixCopiaECola}
+                      </div>
+                    </div>
+                  )}
+                  {(assResultado.links as Record<string, string>)?.invoiceUrl && (
+                    <a href={(assResultado.links as Record<string, string>).invoiceUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[#F7941D] text-sm font-semibold">
+                      <ExternalLink size={14} /> Abrir fatura no Asaas
+                    </a>
+                  )}
+                  {(assResultado.assinatura as Record<string, unknown>) && (
+                    <p className="text-xs text-green-700">Assinatura mensal criada! ID: {(assResultado.assinatura as Record<string, string>).id}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Card: Consultar status */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <BarChart3 size={16} className="text-[#F7941D]" /> Consultar cliente
+              </h3>
+              <div className="flex gap-2">
+                <input value={assCpfCnpj} onChange={e => setAssCpfCnpj(e.target.value)}
+                  placeholder="CPF ou CNPJ" className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50" />
+                <button
+                  disabled={assStatusLoading || !assCpfCnpj}
+                  onClick={async () => {
+                    setAssStatusLoading(true)
+                    const r = await fetch(`/api/asaas/status?cpfCnpj=${assCpfCnpj}`)
+                    const data = await r.json()
+                    setAssStatusData(data)
+                    setAssStatusLoading(false)
+                  }}
+                  className="bg-[#F7941D] text-white px-4 rounded-xl text-sm font-semibold disabled:bg-gray-200 disabled:text-gray-400">
+                  {assStatusLoading ? '...' : 'Buscar'}
+                </button>
+              </div>
+              {assStatusData && (
+                <div className="mt-3 space-y-2">
+                  {!assStatusData.cliente && <p className="text-sm text-gray-400">Cliente não encontrado no Asaas.</p>}
+                  {!!assStatusData.cliente && (
+                    <div className="text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
+                      <p className="font-semibold">{(assStatusData.cliente as Record<string, string>).name}</p>
+                      <p className="text-gray-400">ID: {(assStatusData.cliente as Record<string, string>).id}</p>
+                    </div>
+                  )}
+                  {Array.isArray(assStatusData.cobrancas) && assStatusData.cobrancas.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-1">Cobranças</p>
+                      {(assStatusData.cobrancas as Array<Record<string, unknown>>).map((c) => (
+                        <div key={c.id as string} className="flex justify-between items-center bg-gray-50 rounded-lg px-3 py-2 text-xs mb-1">
+                          <span className="text-gray-700">{c.description as string}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">R$ {c.value as number}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${c.status === 'RECEIVED' || c.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : c.status === 'OVERDUE' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                              {c.status === 'RECEIVED' || c.status === 'CONFIRMED' ? 'Pago' : c.status === 'OVERDUE' ? 'Vencida' : 'Pendente'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
           </div>
         )}
       </div>

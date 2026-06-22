@@ -1,6 +1,6 @@
  import { NextRequest, NextResponse } from 'next/server'
 
-const ORIGEM = process.env.TENANT_ORIGEM || 'Curitiba, PR, Brazil'
+const ORIGEM = 'Av. Silva Jardim 2424, Batel, Curitiba, PR, Brazil'
 
 export async function GET(req: NextRequest) {
   const destino = req.nextUrl.searchParams.get('destino')

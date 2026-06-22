@@ -212,7 +212,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
   // TELA INÍCIO
   if (tela === 'inicio') {
     return (
-      <div className="min-h-screen bg-[#2B6344] flex flex-col">
+      <div className="min-h-screen bg-[#F7941D] flex flex-col">
 
         {/* Modal aviso de virada de turno */}
         {avisoTurno && (
@@ -222,7 +222,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
               <h2 className="text-xl font-black text-gray-900 mb-2">{avisoTurno.titulo.slice(3)}</h2>
               <p className="text-gray-500 text-sm mb-6">{avisoTurno.texto}</p>
               <button onClick={() => setAvisoTurno(null)}
-                className="w-full bg-[#2B6344] text-[#EDD9A3] font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform">
+                className="w-full bg-[#F7941D] text-white font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform">
                 Entendido ✅
               </button>
             </div>
@@ -242,7 +242,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
         <div className="text-center px-6 py-6">
           <div className="text-6xl mb-3">🛵</div>
           <h1 className="text-4xl font-black text-white drop-shadow">{profile.nome.split(' ')[0]}</h1>
-          <p className="text-white/70 mt-1">Al&apos;hamin · Curitiba</p>
+          <p className="text-white/70 mt-1">All Natural · Batel</p>
         </div>
 
         {/* Stats */}
@@ -274,7 +274,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             </div>
           ) : (
             <button onClick={() => setTela('nova')}
-              className="w-full bg-[#EDD9A3] text-[#2B6344] font-black text-xl py-6 rounded-3xl shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-3">
+              className="w-full bg-white text-[#F7941D] font-black text-xl py-6 rounded-3xl shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-3">
               <Plus size={28} /> Nova Entrega
             </button>
           )}
@@ -316,8 +316,8 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
   if (tela === 'go') {
     const msg = gerarMensagem(profile.nome, entregasPendentes)
     return (
-      <div className="min-h-screen bg-[#F5F0E6] flex flex-col p-6">
-        <button onClick={() => setTela('inicio')} className="flex items-center gap-2 text-[#2B6344] font-semibold mb-6">
+      <div className="min-h-screen bg-[#FFF8F0] flex flex-col p-6">
+        <button onClick={() => setTela('inicio')} className="flex items-center gap-2 text-[#F7941D] font-semibold mb-6">
           <ArrowLeft size={20} /> Voltar
         </button>
         <h2 className="text-2xl font-black text-gray-900 mb-2">📲 Enviar GO</h2>
@@ -341,8 +341,8 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
 
   // TELA NOVA ENTREGA
   return (
-    <div className="min-h-screen bg-[#F5F0E6] flex flex-col">
-      <div className="bg-[#2B6344] px-6 pt-6 pb-5">
+    <div className="min-h-screen bg-[#FFF8F0] flex flex-col">
+      <div className="bg-[#F7941D] px-6 pt-6 pb-5">
         <button onClick={() => setTela('inicio')} className="flex items-center gap-2 text-white/80 font-semibold mb-4 text-sm">
           <ArrowLeft size={18} /> {profile.nome.split(' ')[0]}
         </button>
@@ -357,7 +357,7 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             <button onClick={() => { setTipo('ifood'); setKm(''); setKmManual(false) }}
               className={`py-4 rounded-2xl font-bold text-base transition-all ${tipo === 'ifood' ? 'bg-red-500 text-white shadow-md' : 'bg-gray-100 text-gray-600'}`}>🛍️ iFood</button>
             <button onClick={() => { setTipo('por_fora'); setKm(''); setKmManual(false) }}
-              className={`py-4 rounded-2xl font-bold text-base transition-all ${tipo === 'por_fora' ? 'bg-[#2B6344] text-white shadow-md' : 'bg-gray-100 text-gray-600'}`}>📦 Por Fora</button>
+              className={`py-4 rounded-2xl font-bold text-base transition-all ${tipo === 'por_fora' ? 'bg-[#F7941D] text-white shadow-md' : 'bg-gray-100 text-gray-600'}`}>📦 Por Fora</button>
           </div>
         </div>
 
@@ -367,19 +367,19 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Código iFood</label>
               <input type="text" value={codigoIfood} onChange={e => setCodigoIfood(e.target.value.toUpperCase())}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base font-mono focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base font-mono focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                 placeholder="Ex: ABC-1234" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Endereço do cliente</label>
               <AutocompleteInput value={enderecoIfood} onChange={setEnderecoIfood}
                 onBlur={(v) => v && calcularKmAuto(v)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                 placeholder="Ex: Rua XV de Novembro 123" />
             </div>
             {calculandoKm && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
+                <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
                 Calculando km...
               </div>
             )}
@@ -387,12 +387,12 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Distância (km)</label>
                 <input type="number" value={km} onChange={e => setKm(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                   placeholder="Ex: 4.5" step="0.1" min="0" />
               </div>
             )}
             {!kmManual && km && !calculandoKm && (
-              <div className="flex items-center gap-2 text-sm text-[#2B6344] bg-green-50 rounded-xl px-3 py-2">
+              <div className="flex items-center gap-2 text-sm text-[#F7941D] bg-orange-50 rounded-xl px-3 py-2">
                 <span>📍</span><span className="font-semibold">{km} km calculado</span>
                 <button onClick={() => { setKm(''); setKmManual(true) }} className="ml-auto text-xs text-gray-400 underline">editar</button>
               </div>
@@ -407,26 +407,26 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
             {!usandoLivre ? (
               <>
                 <select value={enderecoSelecionado} onChange={e => setEnderecoSelecionado(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50">
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50">
                   <option value="">Selecionar destino...</option>
                   {enderecosFavoritos.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
                 </select>
                 <button onClick={() => { setUsandoLivre(true); setEnderecoSelecionado(''); setKm(''); setKmManual(false) }}
-                  className="text-sm text-[#2B6344] font-medium">+ Digitar outro endereço</button>
+                  className="text-sm text-[#F7941D] font-medium">+ Digitar outro endereço</button>
               </>
             ) : (
               <>
                 <AutocompleteInput value={enderecoLivre} onChange={setEnderecoLivre}
                   onBlur={(v) => v && calcularKmAuto(v)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                   placeholder="Ex: Rua XV de Novembro 123, Curitiba" />
                 <button onClick={() => { setUsandoLivre(false); setEnderecoLivre(''); setKm(''); setKmManual(false) }}
-                  className="text-sm text-[#2B6344] font-medium">← Usar destino salvo</button>
+                  className="text-sm text-[#F7941D] font-medium">← Usar destino salvo</button>
               </>
             )}
             {calculandoKm && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin h-4 w-4 border-2 border-[#2B6344] border-t-transparent rounded-full" />
+                <div className="animate-spin h-4 w-4 border-2 border-[#F7941D] border-t-transparent rounded-full" />
                 Calculando km...
               </div>
             )}
@@ -434,12 +434,12 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Distância (km)</label>
                 <input type="number" value={km} onChange={e => setKm(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-gray-50"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#F7941D] bg-gray-50"
                   placeholder="Ex: 6.0" step="0.1" min="0" />
               </div>
             )}
             {!kmManual && km && !calculandoKm && (
-              <div className="flex items-center gap-2 text-sm text-[#2B6344] bg-green-50 rounded-xl px-3 py-2">
+              <div className="flex items-center gap-2 text-sm text-[#F7941D] bg-orange-50 rounded-xl px-3 py-2">
                 <span>📍</span><span className="font-semibold">{km} km calculado</span>
                 <button onClick={() => { setKm(''); setKmManual(true) }} className="ml-auto text-xs text-gray-400 underline">editar</button>
               </div>
@@ -449,15 +449,15 @@ export default function QuiosqueClient({ profile, entregasIniciais, enderecosFav
 
         {/* Valor */}
         {valorCalculado > 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
-            <div><p className="text-sm text-gray-600">Valor da corrida</p><p className="text-3xl font-black text-[#2B6344]">{formatarValor(valorCalculado)}</p></div>
+          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between">
+            <div><p className="text-sm text-gray-600">Valor da corrida</p><p className="text-3xl font-black text-[#F7941D]">{formatarValor(valorCalculado)}</p></div>
             <div className="text-sm text-gray-500">{kmNum.toFixed(1)} km</div>
           </div>
         )}
 
         {/* Botão Confirmar */}
         <button onClick={salvarEntrega} disabled={!podeConfirmar || salvando || sucesso}
-          className={`w-full py-6 rounded-3xl font-black text-xl transition-all shadow-lg ${sucesso ? 'bg-green-500 text-white' : podeConfirmar ? 'bg-[#2B6344] active:scale-95 text-white' : 'bg-gray-200 text-gray-400'}`}>
+          className={`w-full py-6 rounded-3xl font-black text-xl transition-all shadow-lg ${sucesso ? 'bg-green-500 text-white' : podeConfirmar ? 'bg-[#F7941D] active:scale-95 text-white' : 'bg-gray-200 text-gray-400'}`}>
           {sucesso ? '✅ Entrega registrada!' : salvando ? 'Salvando...' : '✅ Confirmar Entrega'}
         </button>
       </div>
