@@ -87,6 +87,11 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
   const [novadiaria, setNovaDiaria] = useState('30')
   const [salvandoMotoboy, setSalvandoMotoboy] = useState(false)
   const [erroMotoboy, setErroMotoboy] = useState('')
+  const [editandoMotoboy, setEditandoMotoboy] = useState<string | null>(null)
+  const [editMotoboyTipo, setEditMotoboyTipo] = useState<'fixo' | 'avulso'>('fixo')
+  const [editMotoboyDiaria, setEditMotoboyDiaria] = useState('')
+  const [editMotoboyNome, setEditMotoboyNome] = useState('')
+  const [salvandoEdicaoMotoboy, setSalvandoEdicaoMotoboy] = useState(false)
   const [semanaOffset, setSemanaOffset] = useState(0) // 0 = semana atual, -1 = semana passada
 
   // Quinzena
@@ -192,6 +197,21 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
     setMotoboys(prev => prev.map(m => m.id === id ? { ...m, ativo } : m))
     // Ao reativar, recarrega entregas para garantir que só apareçam as de hoje
     if (ativo) await recarregar()
+  }
+
+  async function salvarEdicaoMotoboy(id: string) {
+    setSalvandoEdicaoMotoboy(true)
+    const diaria = parseFloat(editMotoboyDiaria) || 0
+    await supabase.from('profiles').update({
+      nome: editMotoboyNome,
+      tipo: editMotoboyTipo,
+      valor_diaria: diaria,
+    }).eq('id', id)
+    setMotoboys(prev => prev.map(m => m.id === id
+      ? { ...m, nome: editMotoboyNome, tipo: editMotoboyTipo, valor_diaria: diaria }
+      : m))
+    setSalvandoEdicaoMotoboy(false)
+    setEditandoMotoboy(null)
   }
 
   async function criarMotoboy() {
@@ -691,15 +711,57 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Rodando agora ✅</p>
               <div className="space-y-2">
                 {motoboys.filter(m => m.ativo !== false).map(m => (
-                  <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
-                      <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
-                    </div>
-                    <button onClick={() => toggleMotoboy(m.id, false)}
-                      className="text-xs bg-red-50 text-red-500 border border-red-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
-                      Pausar
-                    </button>
+                  <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
+                    {editandoMotoboy === m.id ? (
+                      <div className="space-y-3">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editando motoboy</p>
+                        <input type="text" value={editMotoboyNome} onChange={e => setEditMotoboyNome(e.target.value)}
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]"
+                          placeholder="Nome" />
+                        <div className="flex gap-2">
+                          <button onClick={() => setEditMotoboyTipo('fixo')}
+                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'fixo' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                            Fixo
+                          </button>
+                          <button onClick={() => setEditMotoboyTipo('avulso')}
+                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'avulso' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                            Avulso
+                          </button>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1 ml-1">Diária (R$)</label>
+                          <input type="number" value={editMotoboyDiaria} onChange={e => setEditMotoboyDiaria(e.target.value)}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]" />
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => salvarEdicaoMotoboy(m.id)} disabled={salvandoEdicaoMotoboy}
+                            className="flex-1 py-2 bg-[#2B6344] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
+                            {salvandoEdicaoMotoboy ? 'Salvando...' : 'Salvar'}
+                          </button>
+                          <button onClick={() => setEditandoMotoboy(null)}
+                            className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold active:scale-95 transition-transform">
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
+                          <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}
+                            className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                            ✏️
+                          </button>
+                          <button onClick={() => toggleMotoboy(m.id, false)}
+                            className="text-xs bg-red-50 text-red-500 border border-red-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                            Pausar
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -711,15 +773,57 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Pausados ⏸</p>
                 <div className="space-y-2">
                   {motoboys.filter(m => m.ativo === false).map(m => (
-                    <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between opacity-60">
-                      <div>
-                        <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
-                        <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
-                      </div>
-                      <button onClick={() => toggleMotoboy(m.id, true)}
-                        className="text-xs bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
-                        Ativar
-                      </button>
+                    <div key={m.id} className={`bg-white rounded-2xl p-4 shadow-sm ${editandoMotoboy !== m.id ? 'opacity-60' : ''}`}>
+                      {editandoMotoboy === m.id ? (
+                        <div className="space-y-3">
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editando motoboy</p>
+                          <input type="text" value={editMotoboyNome} onChange={e => setEditMotoboyNome(e.target.value)}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]"
+                            placeholder="Nome" />
+                          <div className="flex gap-2">
+                            <button onClick={() => setEditMotoboyTipo('fixo')}
+                              className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'fixo' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                              Fixo
+                            </button>
+                            <button onClick={() => setEditMotoboyTipo('avulso')}
+                              className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${editMotoboyTipo === 'avulso' ? 'bg-[#2B6344] text-white border-[#2B6344]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                              Avulso
+                            </button>
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1 ml-1">Diária (R$)</label>
+                            <input type="number" value={editMotoboyDiaria} onChange={e => setEditMotoboyDiaria(e.target.value)}
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344]" />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={() => salvarEdicaoMotoboy(m.id)} disabled={salvandoEdicaoMotoboy}
+                              className="flex-1 py-2 bg-[#2B6344] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
+                              {salvandoEdicaoMotoboy ? 'Salvando...' : 'Salvar'}
+                            </button>
+                            <button onClick={() => setEditandoMotoboy(null)}
+                              className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold active:scale-95 transition-transform">
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold text-gray-800">🛵 {m.nome}</p>
+                            <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}
+                              className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                              ✏️
+                            </button>
+                            <button onClick={() => toggleMotoboy(m.id, true)}
+                              className="text-xs bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
+                              Ativar
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
