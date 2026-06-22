@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { calcularValorPorKm, formatarValor } from '@/lib/km'
 import { useRouter } from 'next/navigation'
-import { LogOut, Plus, Clock, TrendingUp, Package, Calendar, Send, KeyRound } from 'lucide-react'
+import { LogOut, Plus, Clock, TrendingUp, Package, Calendar, Send } from 'lucide-react'
 import AutocompleteInput from '@/components/AutocompleteInput'
 import { getTurno, getTurnoInfo } from '@/lib/turno'
 
@@ -151,7 +151,6 @@ export default function DashboardClient({ profile, entregasIniciais, todasEntreg
               <Send size={14} /> GO
             </button>
           )}
-          <a href="/perfil" title="Trocar senha" className="p-2 rounded-full hover:bg-orange-600 text-white/70 hover:text-white"><KeyRound size={18} /></a>
           <button onClick={sair} className="p-2 rounded-full hover:bg-orange-600"><LogOut size={18} /></button>
         </div>
       </header>
