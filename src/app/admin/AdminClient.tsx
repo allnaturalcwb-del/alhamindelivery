@@ -107,6 +107,10 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
   const [editMotoboyDiaria, setEditMotoboyDiaria] = useState('')
   const [editMotoboyNome, setEditMotoboyNome] = useState('')
   const [salvandoEdicaoMotoboy, setSalvandoEdicaoMotoboy] = useState(false)
+  const [resetandoSenhaId, setResetandoSenhaId] = useState<string | null>(null)
+  const [resetSenhaInput, setResetSenhaInput] = useState('')
+  const [salvandoResetSenha, setSalvandoResetSenha] = useState(false)
+  const [erroResetSenha, setErroResetSenha] = useState('')
   const [semanaOffset, setSemanaOffset] = useState(0) // 0 = semana atual, -1 = semana passada
 
   // Quinzena
@@ -227,6 +231,24 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
       : m))
     setSalvandoEdicaoMotoboy(false)
     setEditandoMotoboy(null)
+  }
+
+  async function resetarSenhaMotoboy(id: string) {
+    if (!resetSenhaInput || resetSenhaInput.length < 6) {
+      setErroResetSenha('Senha deve ter no mínimo 6 caracteres.')
+      return
+    }
+    setSalvandoResetSenha(true); setErroResetSenha('')
+    const res = await fetch('/api/admin/resetar-senha-motoboy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, novaSenha: resetSenhaInput }),
+    })
+    const data = await res.json()
+    setSalvandoResetSenha(false)
+    if (!res.ok) { setErroResetSenha(data.error || 'Erro ao resetar senha.'); return }
+    setResetandoSenhaId(null)
+    setResetSenhaInput('')
   }
 
   async function criarMotoboy() {
@@ -795,7 +817,8 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">
                           <p className="font-semibold text-gray-800 truncate">🛵 {m.nome}</p>
                           <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
@@ -804,6 +827,11 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                           <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}
                             className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform">
                             ✏️
+                          </button>
+                          <button onClick={() => { setResetandoSenhaId(resetandoSenhaId === m.id ? null : m.id); setResetSenhaInput(''); setErroResetSenha('') }}
+                            className="text-xs bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1.5 rounded-xl font-semibold active:scale-95 transition-transform"
+                            title="Resetar senha">
+                            🔑
                           </button>
                           {pausado ? (
                             <>
@@ -829,6 +857,31 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                             </button>
                           )}
                         </div>
+                        </div>
+                        {/* Painel reset de senha */}
+                        {resetandoSenhaId === m.id && (
+                          <div className="border border-gray-200 rounded-xl p-3 bg-gray-50 space-y-2">
+                            <p className="text-xs font-semibold text-gray-600">Nova senha para {m.nome}</p>
+                            <input
+                              type="text"
+                              value={resetSenhaInput}
+                              onChange={e => setResetSenhaInput(e.target.value)}
+                              placeholder="Mínimo 6 caracteres"
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B6344] bg-white"
+                            />
+                            {erroResetSenha && <p className="text-xs text-red-500">{erroResetSenha}</p>}
+                            <div className="flex gap-2">
+                              <button onClick={() => resetarSenhaMotoboy(m.id)} disabled={salvandoResetSenha}
+                                className="flex-1 py-2 bg-[#2B6344] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50">
+                                {salvandoResetSenha ? 'Salvando...' : 'Confirmar reset'}
+                              </button>
+                              <button onClick={() => { setResetandoSenhaId(null); setResetSenhaInput(''); setErroResetSenha('') }}
+                                className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold active:scale-95 transition-transform">
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
