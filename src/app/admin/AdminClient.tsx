@@ -34,7 +34,7 @@ const DIARIA_MANHA_FIXO = 45
 const DIARIA_MANHA_AVULSO = 35
 const DIARIA_NOITE = 45
 
-type Profile = { id: string; nome: string; tipo: string; role: string; valor_diaria: number; ativo?: boolean }
+type Profile = { id: string; nome: string; tipo: string; role: string; valor_diaria: number; ativo?: boolean; email?: string }
 type Entrega = { id: string; tipo: string; codigo_ifood: string | null; endereco_destino: string; km_calculado: number | null; valor_km: number; created_at: string; motoboy_nome: string; motoboy_tipo: string; motoboy_id: string }
 type Endereco = { id: string; nome: string; endereco_completo: string; ativo: boolean }
 
@@ -822,6 +822,7 @@ export default function AdminClient({ profile, entregasIniciais, todasEntregas, 
                         <div className="min-w-0">
                           <p className="font-semibold text-gray-800 truncate">🛵 {m.nome}</p>
                           <p className="text-xs text-gray-400">{m.tipo} · {formatarValor(m.valor_diaria || 30)}/dia</p>
+                          {m.email && <p className="text-xs text-gray-400 truncate">{m.email}</p>}
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <button onClick={() => { setEditandoMotoboy(m.id); setEditMotoboyNome(m.nome); setEditMotoboyTipo(m.tipo as 'fixo' | 'avulso'); setEditMotoboyDiaria(String(m.valor_diaria || 30)) }}

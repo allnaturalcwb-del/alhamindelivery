@@ -28,7 +28,11 @@ export default async function AdminPage() {
     .order('created_at', { ascending: false })
     .limit(500)
 
-  const { data: motoboys } = await db.from('profiles').select('*').eq('role', 'motoboy').order('nome')
+  const { data: motoboyProfiles } = await db.from('profiles').select('*').eq('role', 'motoboy').order('nome')
+  const { data: { users: authUsers } } = await db.auth.admin.listUsers({ perPage: 200 })
+  const emailMap: Record<string, string> = {}
+  authUsers?.forEach(u => { emailMap[u.id] = u.email ?? '' })
+  const motoboys = (motoboyProfiles || []).map(m => ({ ...m, email: emailMap[m.id] ?? '' }))
   const { data: enderecos } = await db.from('enderecos_favoritos').select('*').order('nome')
 
   return <AdminClient
